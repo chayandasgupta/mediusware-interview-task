@@ -2012,6 +2012,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 
@@ -2038,13 +2044,16 @@ __webpack_require__.r(__webpack_exports__);
       }],
       product_variant_prices: [],
       dropzoneOptions: {
-        url: 'https://httpbin.org/post',
+        url: 'http://127.0.0.1:8000/product/store',
         thumbnailWidth: 150,
         maxFilesize: 0.5,
         headers: {
           "My-Awesome-Header": "header value"
-        }
-      }
+        },
+        autoProcessQueue: false,
+        uploadMultiple: true
+      },
+      errors: []
     };
   },
   methods: {
@@ -2098,8 +2107,13 @@ __webpack_require__.r(__webpack_exports__);
       }, []);
       return ans;
     },
+    getImage: function getImage() {
+      console.log(this.$refs.myVueDropzone.getUploadingFiles());
+    },
     // store product into database
     saveProduct: function saveProduct() {
+      var _this2 = this;
+
       var product = {
         title: this.product_name,
         sku: this.product_sku,
@@ -2110,8 +2124,11 @@ __webpack_require__.r(__webpack_exports__);
       };
       axios.post('/product', product).then(function (response) {
         console.log(response.data);
+        _this2.errors = [];
       })["catch"](function (error) {
-        console.log(error);
+        if (error.response.status == 422) {
+          _this2.errors = error.response.data.errors;
+        }
       });
       console.log(product);
     }
@@ -50500,7 +50517,17 @@ var render = function() {
                     _vm.product_name = $event.target.value
                   }
                 }
-              })
+              }),
+              _vm._v(" "),
+              _vm.errors.title
+                ? _c("span", { staticClass: "text-danger " }, [
+                    _vm._v(
+                      "\n                            " +
+                        _vm._s(_vm.errors.title[0]) +
+                        "\n                        "
+                    )
+                  ])
+                : _vm._e()
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "form-group" }, [
@@ -50526,7 +50553,17 @@ var render = function() {
                     _vm.product_sku = $event.target.value
                   }
                 }
-              })
+              }),
+              _vm._v(" "),
+              _vm.errors.sku
+                ? _c("span", { staticClass: "text-danger " }, [
+                    _vm._v(
+                      "\n                            " +
+                        _vm._s(_vm.errors.sku[0]) +
+                        "\n                        "
+                    )
+                  ])
+                : _vm._e()
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "form-group" }, [
@@ -50582,7 +50619,7 @@ var render = function() {
             "div",
             { staticClass: "card-body" },
             _vm._l(_vm.product_variant, function(item, index) {
-              return _c("div", { staticClass: "row" }, [
+              return _c("div", { key: index, staticClass: "row" }, [
                 _c("div", { staticClass: "col-md-4" }, [
                   _c("div", { staticClass: "form-group" }, [
                     _c("label", { attrs: { for: "" } }, [_vm._v("Option")]),
@@ -50705,7 +50742,7 @@ var render = function() {
                 _c(
                   "tbody",
                   _vm._l(_vm.product_variant_prices, function(variant_price) {
-                    return _c("tr", [
+                    return _c("tr", { key: variant_price.id }, [
                       _c("td", [_vm._v(_vm._s(variant_price.title))]),
                       _vm._v(" "),
                       _c("td", [
@@ -63300,8 +63337,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /home/rifat/Programming/mediusware/interview/interview-question-sr/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /home/rifat/Programming/mediusware/interview/interview-question-sr/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\xampp\htdocs\interview-question-sr\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp\htdocs\interview-question-sr\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

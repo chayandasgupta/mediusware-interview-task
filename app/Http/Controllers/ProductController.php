@@ -7,6 +7,7 @@ use App\Models\ProductVariant;
 use App\Models\ProductVariantPrice;
 use App\Models\Variant;
 use Illuminate\Http\Request;
+use App\Http\Requests\ProductRequest;
 
 class ProductController extends Controller
 {
@@ -16,8 +17,13 @@ class ProductController extends Controller
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function index()
-    {
-        return view('products.index');
+    {   
+        $products = Product::join('product_variant_prices', 'product_variant_prices.product_id', '=', 'products.id')
+        ->join('product_variants', 'product_variants.id', '=', 'product_variant_prices.product_variant_one')
+        ->groupBy('product_variant_prices.product_id')
+        ->get();
+        dd($products);
+        return view('products.index', compact('products'));
     }
 
     /**
@@ -37,9 +43,13 @@ class ProductController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
-    {
-
+    public function store(ProductRequest $request)
+    {   
+        return $request->file('product_image');
+        $product = new Product();
+        $product->fill($request->all())->save();
+        
+        return response()->json('ok');
     }
 
 

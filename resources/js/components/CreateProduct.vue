@@ -7,10 +7,16 @@
                         <div class="form-group">
                             <label for="">Product Name</label>
                             <input type="text" v-model="product_name" placeholder="Product Name" class="form-control">
+                             <span class="text-danger " v-if="errors.title">
+                                {{ errors.title[0] }}
+                            </span>
                         </div>
                         <div class="form-group">
                             <label for="">Product SKU</label>
                             <input type="text" v-model="product_sku" placeholder="Product Name" class="form-control">
+                             <span class="text-danger " v-if="errors.sku">
+                                {{ errors.sku[0] }}
+                            </span>
                         </div>
                         <div class="form-group">
                             <label for="">Description</label>
@@ -35,7 +41,7 @@
                         <h6 class="m-0 font-weight-bold text-primary">Variants</h6>
                     </div>
                     <div class="card-body">
-                        <div class="row" v-for="(item,index) in product_variant">
+                        <div class="row" v-for="(item,index) in product_variant" :key="index">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="">Option</label>
@@ -74,7 +80,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="variant_price in product_variant_prices">
+                                <tr v-for="variant_price in product_variant_prices" :key="variant_price.id">
                                     <td>{{ variant_price.title }}</td>
                                     <td>
                                         <input type="text" class="form-control" v-model="variant_price.price">
@@ -126,11 +132,14 @@ export default {
             ],
             product_variant_prices: [],
             dropzoneOptions: {
-                url: 'https://httpbin.org/post',
+                url: 'http://127.0.0.1:8000/product/store',
                 thumbnailWidth: 150,
                 maxFilesize: 0.5,
-                headers: {"My-Awesome-Header": "header value"}
-            }
+                headers: {"My-Awesome-Header": "header value"},
+                autoProcessQueue: false,
+                uploadMultiple: true,
+            },
+            errors: [],
         }
     },
     methods: {
@@ -177,6 +186,10 @@ export default {
             return ans;
         },
 
+        getImage() {
+          console.log(this.$refs.myVueDropzone.getUploadingFiles())
+        },
+
         // store product into database
         saveProduct() {
             let product = {
@@ -188,11 +201,14 @@ export default {
                 product_variant_prices: this.product_variant_prices
             }
 
-
             axios.post('/product', product).then(response => {
                 console.log(response.data);
+                this.errors = [];
             }).catch(error => {
-                console.log(error);
+                if(error.response.status == 422)
+                {
+                    this.errors = error.response.data.errors
+                }
             })
 
             console.log(product);
